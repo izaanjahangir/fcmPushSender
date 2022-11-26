@@ -1,10 +1,11 @@
 const express = require("express");
+const firebaseAdmin = require("./firebaseAdmin");
 const app = express();
 const PORT = 5001;
 
 app.use(express.json());
 
-app.post("/send", (req, res) => {
+app.post("/send", async (req, res) => {
   try {
     const payload = {
       title: req.body.title,
@@ -17,6 +18,16 @@ app.post("/send", (req, res) => {
         data: JSON.stringify(req.body.data),
       };
     }
+
+    const response = await firebaseAdmin.sendNotification(payload);
+
+    res.status(200).json({
+      message: "success",
+      success: true,
+      data: {
+        fcmResponse: response,
+      },
+    });
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });
   }
